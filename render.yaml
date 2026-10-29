@@ -1,0 +1,37 @@
+# render.yaml — Render Blueprint for one-click deployment
+# See: https://render.com/docs/blueprint-spec
+
+services:
+  # ------------------------------------------------------------------
+  # Microservice 2: Python FastAPI Logic Engine
+  # ------------------------------------------------------------------
+  - type: web
+    name: student-query-logic-engine
+    runtime: python
+    rootDir: logic-engine
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: LLM_API_KEY
+        sync: false          # Set manually in Render dashboard
+      - key: LLM_PROVIDER
+        value: gemini
+    plan: free
+
+  # ------------------------------------------------------------------
+  # Microservice 1: Node.js Express API Gateway
+  # ------------------------------------------------------------------
+  - type: web
+    name: student-query-api-gateway
+    runtime: node
+    rootDir: api-gateway
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PYTHON_SERVICE_URL
+        fromService:
+          type: web
+          name: student-query-logic-engine
+          property: hostport
+    plan: free
+
