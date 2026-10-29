@@ -150,6 +150,80 @@ app.post("/api/resolve", async (req, res) => {
 });
 
 // ---------------------------------------------------------------------------
+// Generic proxy helper for GET requests to the Python Logic Engine
+// ---------------------------------------------------------------------------
+
+/**
+ * Forwards a GET request to the Python Logic Engine and returns its response.
+ * Used for history, analytics, and query-lookup endpoints.
+ */
+async function proxyGet(pythonPath, res) {
+  try {
+    const response = await axios.get(`${PYTHON_SERVICE_URL}${pythonPath}`, {
+      timeout: 15000,
+    });
+    return res.json(response.data);
+  } catch (error) {
+    if (error.response) {
+      return res.status(error.response.status).json({
+        error: "Logic Engine Error",
+        message: error.response.data?.detail || "Error from Logic Engine.",
+      });
+    } else if (error.request) {
+      return res.status(503).json({
+        error: "Service Unavailable",
+        message: "The Logic Engine is currently unreachable.",
+      });
+    } else {
+      return res.status(500).json({
+        error: "Internal Server Error",
+        message: "An unexpected error occurred.",
+      });
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// GET /api/history/:studentId — Student Query History
+// ---------------------------------------------------------------------------
+
+app.get("/api/history/:studentId", async (req, res) => {
+  const { studentId } = req.params;
+  const { limit = 20, offset = 0 } = req.query;
+  console.log(`[GATEWAY] History request for ${studentId}`);
+  return proxyGet(`/history/${studentId}?limit=${limit}&offset=${offset}`, res);
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/query/:queryId — Single Query Lookup
+// ---------------------------------------------------------------------------
+
+app.get("/api/query/:queryId", async (req, res) => {
+  const { queryId } = req.params;
+  console.log(`[GATEWAY] Query lookup: ${queryId}`);
+  return proxyGet(`/query/${queryId}`, res);
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/queries/recent — Recent Queries
+// ---------------------------------------------------------------------------
+
+app.get("/api/queries/recent", async (req, res) => {
+  const { limit = 50 } = req.query;
+  console.log("[GATEWAY] Recent queries request");
+  return proxyGet(`/queries/recent?limit=${limit}`, res);
+});
+
+// ---------------------------------------------------------------------------
+// GET /api/analytics — Aggregate Analytics
+// ---------------------------------------------------------------------------
+
+app.get("/api/analytics", async (req, res) => {
+  console.log("[GATEWAY] Analytics request");
+  return proxyGet("/analytics", res);
+});
+
+// ---------------------------------------------------------------------------
 // Start Server
 // ---------------------------------------------------------------------------
 

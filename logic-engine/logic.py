@@ -29,6 +29,8 @@ from typing import Any, Callable
 import httpx
 from dotenv import load_dotenv
 
+from database import save_query, is_connected
+
 load_dotenv()
 
 # ---------------------------------------------------------------------------
@@ -613,6 +615,17 @@ async def resolve_query(student_id: str, query_text: str) -> dict[str, Any]:
             "nodesExplored": astar_result["explored"],
             "explanation": astar_result["explanation"],
         }
+
+    # --- Step 5: Persist to Neon Postgres (non-blocking) ---
+    if is_connected():
+        await save_query(
+            query_id=query_id,
+            student_id=student_id,
+            query_text=query_text,
+            classification=frame,
+            routing=response["routing"],
+            escalation=response.get("escalation"),
+        )
 
     return response
 

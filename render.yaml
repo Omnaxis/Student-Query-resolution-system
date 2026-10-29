@@ -16,6 +16,8 @@ services:
         sync: false          # Set manually in Render dashboard
       - key: LLM_PROVIDER
         value: gemini
+      - key: DATABASE_URL
+        sync: false          # Neon Postgres connection string — set in dashboard
     plan: free
 
   # ------------------------------------------------------------------
