@@ -527,10 +527,10 @@
     // ---------------------------------------------------------------
     // In production, this points to your Render-hosted API Gateway.
     // For local development, it defaults to localhost:3000.
-    const API_URL =
-      window.location.hostname === "localhost"
-        ? "http://localhost:3000"
-        : "%%API_GATEWAY_URL%%"; // Replace at build/deploy time
+    const API_URL ="http://localhost:3000";
+     // window.location.hostname === "localhost"
+      //  ? "http://localhost:3000"
+      //  : "%%API_GATEWAY_URL%%"; // Replace at build/deploy time
 
     const chatContainer = document.getElementById("chatContainer");
     const queryInput = document.getElementById("queryInput");

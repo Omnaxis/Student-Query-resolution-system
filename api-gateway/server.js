@@ -29,7 +29,7 @@ require("dotenv").config();
 
 const PORT = process.env.PORT || 3000;
 const PYTHON_SERVICE_URL =
-  process.env.PYTHON_SERVICE_URL || "http://localhost:8000";
+process.env.PYTHON_SERVICE_URL || "http://localhost:8000";
 
 // ---------------------------------------------------------------------------
 // Express Application Setup
