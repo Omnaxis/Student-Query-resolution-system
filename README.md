@@ -2,7 +2,6 @@
 
 A microservice-based automated query resolution platform that classifies, routes, and resolves student administrative and academic inquiries using AI, rule-based expert systems, and A* pathfinding with Min-Heap optimisation.
 
-> Built for **CCSE0301 Data Structures and Algorithms & Artificial Intelligence** coursework.
 
 ---
 
